@@ -1,16 +1,17 @@
+
 # Syncare Frontend API Documentation
 
 Welcome to the frontend API documentation for the **Syncare** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
 
-##  Base Details
+## 🔗 Base Details
 * **Base URL**: `[TO BE ADDED LATER]`
 * **Default Content-Type**: `application/json`
 
 ---
 
-##  Authentication
+## 🔐 Authentication
 
-This API uses **JSON Web Tokens (JWT)**.
+This API uses **JSON Web Tokens (JWT)** for standard users.
 For any endpoints that require authentication, you must include the token in your requests via the `Authorization` header:
 
 ```http
@@ -20,7 +21,7 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 
 ---
 
-##  ️ Users & Authentication Endpoints
+## 👤 Users & Authentication Endpoints
 
 ### 1. Register a new Patient
 `POST /signup/`
@@ -78,7 +79,7 @@ Deletes the currently authenticated user based on their JWT token payload.
 
 ---
 
-##  Appointments
+## 📅 Appointments
 
 ### 1. Book an Appointment
 `POST /book/`
@@ -148,7 +149,50 @@ Cancels either a single appointment or ALL appointments belonging to the user.
 
 ---
 
-##  Important Clinic Typings
+## 🛡️ Admin Endpoints
+
+Admin routes **do not** require a JWT Bearer token. Instead, they require the secure `ADMIN_PASSWORD` to be passed directly in the request body.
+
+### 1. Fetch Patient Data
+`POST /admin/users/`
+
+Fetches user data for administrative oversight.
+
+**Request Body:**
+```json
+{
+  "password": "supersecretadminpassword", // Required: Admin master password
+  "id": 12 // Integer: The specific Patient ID to fetch
+}
+```
+
+**Responses:**
+* `200 OK`: `{ "status": 200, "data": { ...patient details... } }`
+* `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
+
+---
+
+### 2. Fetch Appointment Data
+`POST /admin/appointments/`
+
+Fetches specific appointment data for administrative oversight.
+
+**Request Body:**
+```json
+{
+  "password": "supersecretadminpassword", // Required: Admin master password
+  "patient_id": 12, // Integer: The patient the appointment belongs to
+  "appointment_id": 42 // Integer: The specific appointment ID
+}
+```
+
+**Responses:**
+* `200 OK`: `{ "status": 200, "data": { ...appointment details... } }`
+* `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
+
+---
+
+## 📋 Important Clinic Typings
 
 When making a request to `POST /book/`, your frontend dropdowns or selectors *must* submit the exact strings listed below for the `type` field. These map to the backend's `AVG_CLINIC_WAITING_TIME` durations:
 
@@ -163,3 +207,4 @@ When making a request to `POST /book/`, your frontend dropdowns or selectors *mu
 * `"Skin Clinic"`
 * `"Cancer Care"`
 * `"Ear, Nose, and Throat"`
+```
