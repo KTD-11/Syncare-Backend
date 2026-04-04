@@ -207,4 +207,3 @@ When making a request to `POST /book/`, your frontend dropdowns or selectors *mu
 * `"Skin Clinic"`
 * `"Cancer Care"`
 * `"Ear, Nose, and Throat"`
-```
