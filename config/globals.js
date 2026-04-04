@@ -19,7 +19,6 @@ const GLOBAL = {
     SLOT_LENGTH: 15,
     MINUTES_TO_HOURS: 60,
     SCHEDULED_TIME_DELIMETER: '|',
-    PORT: 2002,
     AVG_CLINIC_WAITING_TIME: {
         "Adult General Medicine": 20,
         "General Surgery": 15,
