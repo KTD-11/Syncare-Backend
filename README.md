@@ -148,7 +148,7 @@ Cancels either a single appointment or ALL appointments belonging to the user.
 
 ---
 
-## ⚙️ Important Clinic Typings
+##  Important Clinic Typings
 
 When making a request to `POST /book/`, your frontend dropdowns or selectors *must* submit the exact strings listed below for the `type` field. These map to the backend's `AVG_CLINIC_WAITING_TIME` durations:
 
