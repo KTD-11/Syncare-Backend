@@ -296,7 +296,7 @@ app.post('/cancel/', preprocess.preprocessVerifyToken, preprocess.preprocessCanc
     }
 });
 
-app.listen(GLOBAL.PORT, () => {
-    console.log(`Listening on port ${GLOBAL.PORT}`);
-}
+app.listen(process.env.PORT, () => {
+    console.log(`Listening on port ${process.env.PORT}`);
+    }
 );
