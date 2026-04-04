@@ -1,4 +1,0 @@
-DELETE http://localhost:2002/remove/
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZ292SUQiOiIzMDYwNzkyMjE5NTczMyIsImlhdCI6MTc3NTMwMzY3OCwiZXhwIjoxNzc1MzEwODc4fQ.8oh7HllwJXQ2zyU7ZuzM6Fl2rRxJ7Ep_DVrSa4xBRYE
