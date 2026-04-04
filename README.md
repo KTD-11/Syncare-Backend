@@ -1,6 +1,6 @@
-# Orchestrator Frontend API Documentation
+# Syncare Frontend API Documentation
 
-Welcome to the frontend API documentation for the **Orchestrator** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
+Welcome to the frontend API documentation for the **Syncare** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
 
 ##  Base Details
 * **Base URL**: `[TO BE ADDED LATER]`
