@@ -3,7 +3,7 @@
 Welcome to the frontend API documentation for the **Orchestrator** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
 
 ##  Base Details
-* **Base URL**: [TO BE ADDED LATER]
+* **Base URL**: `[TO BE ADDED LATER]`
 * **Default Content-Type**: `application/json`
 
 ---
