@@ -185,7 +185,7 @@ Fetches specific appointment data for administrative oversight.
 }
 ```
 
-> **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously** — at least one must be set.
+> **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously**  (at least one must be set).
 
 **Responses:**
 * `200 OK`: `{ "status": 200, "data": { ...appointment details... } }`
