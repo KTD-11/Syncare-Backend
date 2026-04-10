@@ -32,6 +32,19 @@ const GLOBAL = {
         "Cancer Care": 30,
         "Ear, Nose, and Throat": 20
     },
+    AVAILABLE_CLINICS: [
+        "Adult General Medicine",
+        "General Surgery",
+        "Women's Health",
+        "Children's Health",
+        "Heart Clinic",
+        "Eye Clinic",
+        "Bones and Joints",
+        "Brain and Nerves",
+        "Skin Clinic",
+        "Cancer Care",
+        "Ear, Nose, and Throat"
+    ],
     GET_EVERYONE_INDEX: -1,
     NONE: 0,
     TOKEN_INDEX: 1

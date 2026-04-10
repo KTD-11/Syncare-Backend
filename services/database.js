@@ -41,10 +41,11 @@ function insertBooking(dataFields, scheduledTime){
     const insertSql = `INSERT INTO appointments (  appointment_date,
                                                             appointment_time,
                                                             appointment_type,
-                                                            patient_id) values (?, ?, ?, ?)`;
+                                                            patient_id,
+                                                            appointment_name) values (?, ?, ?, ?, ?)`;
 
     return new Promise(resolve => {
-        db.run(insertSql, [dataFields.date, scheduledTime, dataFields.type, dataFields.id], (err) => {
+        db.run(insertSql, [dataFields.date, scheduledTime, dataFields.type, dataFields.id, dataFields.clinic], function (err) {
             if (err) {
                 console.error(err.message);
 
@@ -56,7 +57,8 @@ function insertBooking(dataFields, scheduledTime){
 
             return resolve({
                 status: 201,
-                message: `Appointment successfully booked at ${scheduledTime}`
+                message: `Appointment successfully booked at ${scheduledTime}`,
+                appointmentID: this.lastID
             });
         });
     });

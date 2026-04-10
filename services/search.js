@@ -122,7 +122,7 @@ function isAvailable(govId) {
 
 function appointmentSearch(appointmentID, patientID) {
     return new Promise(resolve => {
-        const searchSql = `SELECT appointment_id, appointment_date, appointment_time, appointment_type FROM
+        const searchSql = `SELECT appointment_id, appointment_date, appointment_time, appointment_type, appointment_name FROM
         appointments WHERE (appointment_id = ? AND patient_id = ?)`;
 
         db.get(searchSql, [appointmentID, patientID], (err, row) => {

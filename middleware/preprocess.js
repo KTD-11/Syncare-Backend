@@ -13,7 +13,7 @@ function preprocessRegistration(req, res, next) {
 }
 
 function preprocessBooking(req, res, next) {
-    if (!req.body.id || !req.body.date || !req.body.time || !req.body.type) {
+    if (!req.user.id || !req.body.date || !req.body.time || !req.body.type) {
         return res.status(400).json({
             status: 400,
             message: "Missing data-fields. Please check your data"
@@ -35,7 +35,7 @@ function preprocessFetchPatients(req, res, next) {
 }
 
 function preprocessAdminFetchPatients(req, res, next) {
-    if (!req.body.gov_id || !req.body.password) {
+    if (!req.body.id || !req.body.password) {
         return res.status(400).json({
             status: 400,
             message: "Missing credentials"
@@ -46,7 +46,8 @@ function preprocessAdminFetchPatients(req, res, next) {
 }
 
 function preprocessAdminFetchAppointments(req, res, next) {
-    if (!req.body.patient_id || !req.body.appointment_id || !req.body.password) {
+    if (req.body.patient_id === undefined || req.body.patient_id === null ||
+        req.body.appointment_id === undefined || req.body.appointment_id === null  || !req.body.password) {
         return res.status(400).json({
             status: 400,
             message: "Missing credentials"
@@ -81,7 +82,7 @@ function preprocessVerifyToken(req, res, next) {
 }
 
 function preprocessCancel(req, res, next) {
-    if (!req.body.appointment_id || !req.body.patient_id)
+    if (!req.body.appointment_id || !req.user.id)
         return res.status(400).json({
             status: 400,
             message: "Missing credentials"

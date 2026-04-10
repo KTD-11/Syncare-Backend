@@ -1,3 +1,5 @@
+import {GLOBAL} from "../config/globals.js";
+
 function postprocessRegistration(dataFields){
     if (dataFields.name === "" || dataFields.number === "" ){
         return  {
@@ -56,11 +58,23 @@ function postprocessBooking(dataFields){
             message: "Invalid credentials"
         };
 
+    let correctClinic = false;
+    GLOBAL.AVAILABLE_CLINICS.forEach(clinic => {
+        if (clinic === dataFields.clinic)
+            correctClinic = true;
+    });
+
+    if (!correctClinic)
+        return {
+            status: 400,
+            message: "Invalid clinic"
+        };
+
     return { status: 200 };
 }
 
 function postprocessCancel(req){
-    if (isNaN(req.appointmentID)) {
+    if (isNaN(req.body.appointment_id)) {
         if (!(String(req.appointmentID) === '*'))
             return{
                 status: 400,
@@ -70,13 +84,6 @@ function postprocessCancel(req){
         req.all = true;
 
         return { status: 200 }
-    }
-
-    if (isNaN(req.patientId)){
-        return{
-            status: 400,
-            message: "invalid patient ID"
-        };
     }
 
     req.all = false;
@@ -94,7 +101,8 @@ function postprocessAdminFetchUsers(dataFields){
 }
 
 function postprocessAdminFetchAppointments(dataFields){
-    if (!dataFields.patientId || !dataFields.appointmentId)
+    if (dataFields.patientId === undefined || dataFields.patientId === null ||
+        dataFields.appointmentId === undefined || dataFields.appointmentId === null)
         return {
             status: 400,
             message: "Missing credentials"

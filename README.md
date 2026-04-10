@@ -137,7 +137,6 @@ Cancels either a single appointment or ALL appointments belonging to the user.
 **Request Body:**
 ```json
 {
-  "patient_id": 12, // Required
   "appointment_id": 42 // Required. (You can pass "*" as a string to delete ALL appointments for this patient)
 }
 ```

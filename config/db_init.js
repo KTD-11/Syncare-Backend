@@ -33,6 +33,7 @@ db.run(`CREATE TABLE IF NOT EXISTS appointments(
         appointment_time TEXT NOT NULL,
         appointment_type TEXT NOT NULL,
         patient_id INTEGER NOT NULL,
+        appointment_name TEXT NOT NULL,
         FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
         UNIQUE(appointment_date, appointment_time)
     )`, [], (err) => {

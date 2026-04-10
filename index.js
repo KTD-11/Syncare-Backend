@@ -122,7 +122,8 @@ app.post('/book/', preprocess.preprocessVerifyToken, preprocess.preprocessBookin
         id: req.user.id,
         date: validate.validateDate(req.body.date),
         time: validate.validateTime(req.body.time),
-        type: validate.validateType(req.body.type)
+        type: validate.validateType(req.body.type),
+        clinic: String(req.body.type).trim()
     }
 
     const postprocess_results = postprocess.postprocessBooking(dataFields);
