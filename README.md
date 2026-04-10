@@ -194,27 +194,6 @@ Fetches specific appointment data for administrative oversight.
 
 ---
 
-### 3. Delete a User (Admin)
-`DELETE /admin/users/`
-
-Permanently deletes a patient record from the system. This action is irreversible and will cascade-delete all associated appointments.
-
-**Request Body:**
-```json
-{
-  "password": "supersecretadminpassword", // Required: Admin master password
-  "id": 12 // Integer: The Patient ID to delete
-}
-```
-
-**Responses:**
-* `200 OK`: `{ "status": 200, "message": "user deleted successfully" }`
-* `400 Bad Request`: `{ "status": 400, "message": "Invalid ID" }` (Non-numeric or missing ID)
-* `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
-* `404 Not Found`: `{ "status": 404, "message": "User not found" }`
-
----
-
 ## 📋 Important Clinic Typings
 
 When making a request to `POST /book/`, your frontend dropdowns or selectors *must* submit the exact strings listed below for the `type` field. These map to the backend's `AVG_CLINIC_WAITING_TIME` durations:
