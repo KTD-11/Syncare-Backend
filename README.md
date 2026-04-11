@@ -3,6 +3,88 @@
 
 Welcome to the frontend API documentation for the **Syncare** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
 
+---
+
+## 🚀 Get Started
+
+### Prerequisites
+
+- **Node.js** v18 or higher — [nodejs.org](https://nodejs.org)
+- **npm** v9 or higher (bundled with Node.js)
+
+---
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/KTD-11/Syncare-Backend
+cd Syncare-Backend
+```
+
+---
+
+### 2. Install Dependencies
+
+Run the following command from the project root to install all required packages:
+
+```bash
+npm install
+```
+
+This will install the following production dependencies declared in `package.json`:
+
+| Package | Version | Purpose |
+|---|---|---|
+| `express` | ^5.2.1 | Web framework for routing and handling HTTP requests |
+| `jsonwebtoken` | ^9.0.3 | Signing and verifying JWT tokens for user authentication |
+| `bcrypt` | ^6.0.0 | Hashing and comparing passwords securely |
+| `sqlite3` | ^6.0.1 | Lightweight embedded SQL database driver |
+| `dotenv` | ^17.3.1 | Loads environment variables from the `.env` file |
+
+---
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the project root. The server **will not start correctly** without these variables.
+
+```bash
+# .env
+ADMIN_PASSWORD=
+JWT_SECRET=
+PORT=
+```
+
+| Variable | Required | Description |
+|---|---|---|
+| `ADMIN_PASSWORD` | ✅ Yes | A **bcrypt hash** of your chosen admin password. This is used to authenticate all `/admin/` endpoints. Generate one with `bcrypt.hash('yourpassword', 10)`. |
+| `JWT_SECRET` | ✅ Yes | A long, random secret string used to sign and verify JWT tokens. Keep this private and never commit it. |
+| `PORT` | ✅ Yes | The port the Express server will listen on (e.g. `3000`). |
+
+> **⚠️ Security Warning:** `ADMIN_PASSWORD` must be stored as a **bcrypt hash**, not plaintext. The server compares incoming admin passwords against this hash at runtime.
+
+**Example `.env`:**
+
+```env
+ADMIN_PASSWORD=$2a$10$XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+JWT_SECRET=some-long-random-secret-string-that-nobody-can-guess
+PORT=3000
+```
+
+---
+
+### 4. Run the Server
+
+```bash
+node index.js
+```
+
+The server will start and log:
+```
+Listening on port <PORT>
+```
+
+---
+
 ## 🔗 Base Details
 * **Base URL**: `[TO BE ADDED LATER]`
 * **Default Content-Type**: `application/json`
