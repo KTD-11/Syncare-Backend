@@ -113,8 +113,8 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 *Note: The token will expire after **2 hours**.*
 
 **Authentication error responses (applies to all protected endpoints):**
-* `401 Unauthorized`: `{ "status": 401, "message": "Missing token credentials" }` — No token was provided.
-* `403 Forbidden`: `{ "status": 403, "message": "Invalid or expired token" }` — Token failed verification or has expired.
+* `401 Unauthorized`: `{ "status": 401, "message": "Missing token credentials" }` : No token was provided.
+* `403 Forbidden`: `{ "status": 403, "message": "Invalid or expired token" }` : Token failed verification or has expired.
 
 ---
 
@@ -141,7 +141,7 @@ Registers a new user and returns an authentication token immediately upon succes
 |---|---|---|
 | `name` | String | Full name of the patient |
 | `age` | Integer | Patient age. Min: `0`, Max: `200` |
-| `gender` | String | Single character — `"M"` or `"F"` (case-insensitive) |
+| `gender` | String | Single character : `"M"` or `"F"` (case-insensitive) |
 | `number` | String | Contact phone number |
 | `gov_id` | String | Exactly 14 characters. Must start with `2` or `3` and match gender rules |
 | `password` | String | Minimum 10 characters |
@@ -207,7 +207,7 @@ Schedules a new appointment. The scheduling engine validates whether the slot ti
 |---|---|---|
 | `date` | String | Format: `DD/MM/YYYY`. Must be a future date |
 | `time` | String | Format: `HH:MM` (24-hour clock) |
-| `type` | String | Clinic type — see [Clinic Typings](#-important-clinic-typings) section below |
+| `type` | String | Clinic type : see [Clinic Typings](#-important-clinic-typings) section below |
 **Responses:**
 * `201 Created`: `{ "status": 201, "message": "Appointment successfully booked at 14:30" }`
 * `400 Bad Request`: Failed basic validation formats.
