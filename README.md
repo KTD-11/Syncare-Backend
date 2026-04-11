@@ -202,8 +202,8 @@ Fetches all appointments belonging to the authenticated user.
       "appointment_id": 42,
       "appointment_date": "15/05/2026",
       "appointment_time": "14:30",
-      "appointment_type": "General Surgery",
-      "appointment_name": "Dr. Ahmed Hassan"
+      "appointment_type": "30",
+      "appointment_name": "General Surgery"
     }
   ]
 }
