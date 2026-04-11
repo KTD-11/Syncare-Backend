@@ -96,11 +96,9 @@ Listening on port <PORT>
 
 This API uses the `cors` middleware with **default settings**, which means:
 
-* **All origins are allowed** — any domain may make requests to this API.
+* **All origins are allowed** : any domain may make requests to this API.
 * **All standard HTTP methods** are permitted (`GET`, `POST`, `PUT`, `DELETE`, etc.).
 * No custom origin whitelist or credentials restrictions are enforced.
-
-> **Note for production:** The current policy is open (`*`). You may want to restrict allowed origins before deploying to a public environment.
 
 ---
 
