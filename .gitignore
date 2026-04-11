@@ -2,3 +2,5 @@
 main.db
 node_modules
 .idea
+*.db-shm
+*.db-wal
