@@ -100,8 +100,6 @@ This API uses the `cors` middleware with **default settings**, which means:
 * **All standard HTTP methods** are permitted (`GET`, `POST`, `PUT`, `DELETE`, etc.).
 * No custom origin whitelist or credentials restrictions are enforced.
 
-> **Note for production:** The current policy is open (`*`). You may want to restrict allowed origins before deploying to a public environment.
-
 ---
 
 ## 🔐 Authentication
