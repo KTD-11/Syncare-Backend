@@ -20,17 +20,17 @@ const GLOBAL = {
     MINUTES_TO_HOURS: 60,
     SCHEDULED_TIME_DELIMETER: '|',
     AVG_CLINIC_WAITING_TIME: {
-        "Adult General Medicine": 20,
+        "Adult General Medicine": 30,
         "General Surgery": 15,
-        "Women's Health": 25,
-        "Children's Health": 20,
+        "Women's Health": 30,
+        "Children's Health": 15,
         "Heart Clinic": 30,
-        "Eye Clinic": 20,
+        "Eye Clinic": 15,
         "Bones and Joints": 15,
         "Brain and Nerves": 30,
         "Skin Clinic": 30,
         "Cancer Care": 30,
-        "Ear, Nose, and Throat": 20
+        "Ear, Nose, and Throat": 15
     },
     AVAILABLE_CLINICS: [
         "Adult General Medicine",

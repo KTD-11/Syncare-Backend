@@ -74,8 +74,8 @@ function postprocessBooking(dataFields){
 }
 
 function postprocessCancel(req){
-    if (isNaN(req.body.appointment_id)) {
-        if (!(String(req.appointmentID) === '*'))
+    if (isNaN(parseInt(req.body.appointment_id))) {
+        if (!(String(req.body.appointment_id) === '*'))
             return{
                 status: 400,
                 message: "invalid appointment ID"
