@@ -9,7 +9,7 @@ Welcome to the frontend API documentation for the **Syncare** backend. This docu
 
 ### Prerequisites
 
-- **Node.js** v18 or higher — [nodejs.org](https://nodejs.org)
+- **Node.js** v18 or higher : [nodejs.org](https://nodejs.org)
 - **npm** v9 or higher (bundled with Node.js)
 
 ---
