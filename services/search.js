@@ -120,12 +120,12 @@ function isAvailable(govId) {
     });
 }
 
-function appointmentSearch(appointmentID, patientID) {
+function appointmentSearch(patientID) {
     return new Promise(resolve => {
         const searchSql = `SELECT appointment_id, appointment_date, appointment_time, appointment_type, appointment_name FROM
-        appointments WHERE (appointment_id = ? AND patient_id = ?)`;
+        appointments WHERE (patient_id = ?)`;
 
-        db.get(searchSql, [appointmentID, patientID], (err, row) => {
+        db.all(searchSql, [patientID], (err, rows) => {
             if (err) {
                 console.error(err.message);
 
@@ -135,7 +135,7 @@ function appointmentSearch(appointmentID, patientID) {
                 });
             }
 
-            if (!row) {
+            if (rows.length === 0) {
                 return resolve({
                     status: 404,
                     message: "Not found"
@@ -144,9 +144,8 @@ function appointmentSearch(appointmentID, patientID) {
 
             return resolve({
                 status: 200,
-                data: row
-            }
-            );
+                data: rows
+            });
         });
     });
 }

@@ -4,6 +4,8 @@ import 'dotenv/config';
 
 import jwt from 'jsonwebtoken';
 
+import cors from 'cors';
+
 import { GLOBAL } from "./config/globals.js";
 
 import { schedule } from "./auth/c_runner.js";
@@ -22,6 +24,8 @@ import * as admin from "./services/admin.js";
 
 //initializing the express server
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -62,6 +66,9 @@ app.post('/signup/', preprocess.preprocessRegistration, async (req, res) => {
         }
 
         const insertUser = await database.insertNewPatient(dataFields);
+
+        if (insertUser.status !== 201)
+            return res.status(insertUser.status).json(insertUser);
 
         const payload = {
             id: insertUser.id,
@@ -166,18 +173,9 @@ app.post('/book/', preprocess.preprocessVerifyToken, preprocess.preprocessBookin
     }
 });
 
-app.get('/appointments/:id/', preprocess.preprocessVerifyToken, async (req, res) => {
-    const appointmentID = parseInt(req.params.id);
-
-    if (isNaN(appointmentID)) {
-        return res.status(400).json({
-            status: 400,
-            message: "Invalid appointment ID"
-        });
-    }
-
+app.get('/appointments/', preprocess.preprocessVerifyToken, async (req, res) => {
     try {
-        const appointments = await search.appointmentSearch(appointmentID, req.user.id);
+        const appointments = await search.appointmentSearch(req.user.id);
 
         return res.status(appointments.status).json(appointments);
     }

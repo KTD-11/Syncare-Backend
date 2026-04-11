@@ -20,6 +20,13 @@ function insertNewPatient(dataFields){
             if (err){
                 console.error(err.message);
 
+                if (err.message.includes('UNIQUE constraint failed')){
+                    return resolve ({
+                        status: 409,
+                        message: "User already number already exists"
+                    });
+                }
+
                 return resolve ({
                     status: 500,
                     message: "Internal server error"
