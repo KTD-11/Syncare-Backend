@@ -131,13 +131,22 @@ Registers a new user and returns an authentication token immediately upon succes
 ```json
 {
   "name": "John Doe",
-  "age": 30, // Integer (Max: 200, Min: 0)
-  "gender": "M", // Single character "M" or "F" (case-insensitive)
-  "number": "0123456789", // String
-  "gov_id": "29876543210987", // String, Exactly 14 chars. Must start with 2 or 3 and match gender rules.
-  "password": "supersecretpassword" // String, Min 10 characters
+  "age": 30,
+  "gender": "M",
+  "number": "0123456789",
+  "gov_id": "29876543210987",
+  "password": "supersecretpassword"
 }
 ```
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | String | Full name of the patient |
+| `age` | Integer | Patient age. Min: `0`, Max: `200` |
+| `gender` | String | Single character — `"M"` or `"F"` (case-insensitive) |
+| `number` | String | Contact phone number |
+| `gov_id` | String | Exactly 14 characters. Must start with `2` or `3` and match gender rules |
+| `password` | String | Minimum 10 characters |
 
 **Responses:**
 * `201 Created`: `{ "status": 201, "message": "user with id X has been successfully added", "id": X, "token": "..." }`
@@ -190,11 +199,17 @@ Schedules a new appointment. The scheduling engine validates whether the slot ti
 **Request Body:**
 ```json
 {
-  "date": "15/05/2026", // String format: DD/MM/YYYY (Must be a future date)
-  "time": "14:30", // String format: HH:MM (24-hour)
-  "type": "General Surgery" // String (See "Clinic Typings" section below)
+  "date": "15/05/2026",
+  "time": "14:30",
+  "type": "General Surgery"
 }
 ```
+
+| Field | Type | Description |
+|---|---|---|
+| `date` | String | Format: `DD/MM/YYYY`. Must be a future date |
+| `time` | String | Format: `HH:MM` (24-hour clock) |
+| `type` | String | Clinic type — see [Clinic Typings](#-important-clinic-typings) section below |
 **Responses:**
 * `201 Created`: `{ "status": 201, "message": "Appointment successfully booked at 14:30" }`
 * `400 Bad Request`: Failed basic validation formats.
@@ -239,9 +254,13 @@ Cancels either a single appointment or ALL appointments belonging to the user.
 **Request Body:**
 ```json
 {
-  "appointment_id": 42 // Required. (You can pass "*" as a string to delete ALL appointments for this patient)
+  "appointment_id": 42
 }
 ```
+
+| Field | Type | Description |
+|---|---|---|
+| `appointment_id` | Integer \| String | Required. The ID of the appointment to cancel. Pass `"*"` as a string to delete **all** appointments for this patient |
 
 **Responses:**
 * `200 OK`: `{ "status": 200, "message": "appointment deleted successfully" }`
@@ -262,10 +281,15 @@ Fetches user data for administrative oversight.
 **Request Body:**
 ```json
 {
-  "password": "supersecretadminpassword", // Required: Admin master password
-  "id": 12 // Integer: The specific Patient ID to fetch. Pass -1 to fetch ALL patients.
+  "password": "supersecretadminpassword",
+  "id": 12
 }
 ```
+
+| Field | Type | Description |
+|---|---|---|
+| `password` | String | Required. The admin master password |
+| `id` | Integer | The specific Patient ID to fetch. Pass `-1` to fetch **all** patients |
 
 > **Wildcard:** Setting `id` to `-1` returns every patient in the database.
 
@@ -285,11 +309,17 @@ Fetches specific appointment data for administrative oversight.
 **Request Body:**
 ```json
 {
-  "password": "supersecretadminpassword", // Required: Admin master password
-  "patient_id": 12, // Integer: The patient the appointment belongs to
-  "appointment_id": 42 // Integer: The specific appointment ID
+  "password": "supersecretadminpassword",
+  "patient_id": 12,
+  "appointment_id": 42
 }
 ```
+
+| Field | Type | Description |
+|---|---|---|
+| `password` | String | Required. The admin master password |
+| `patient_id` | Integer | The patient the appointment belongs to. Set to `0` to mark as "not specified" |
+| `appointment_id` | Integer | The specific appointment ID. Set to `0` to mark as "not specified" |
 
 > **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously** (at least one must be set).
 
