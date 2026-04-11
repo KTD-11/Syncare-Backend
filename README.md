@@ -9,7 +9,7 @@ Welcome to the frontend API documentation for the **Syncare** backend. This docu
 
 ### Prerequisites
 
-- **Node.js** v18 or higher : [nodejs.org](https://nodejs.org)
+- **Node.js** v18 or higher : [Node.js.org](https://nodejs.org)
 - **npm** v9 or higher (bundled with Node.js)
 
 ---
@@ -33,14 +33,14 @@ npm install
 
 This will install the following production dependencies declared in `package.json`:
 
-| Package | Version | Purpose |
-|---|---|---|
-| `express` | ^5.2.1 | Web framework for routing and handling HTTP requests |
-| `jsonwebtoken` | ^9.0.3 | Signing and verifying JWT tokens for user authentication |
-| `bcrypt` | ^6.0.0 | Hashing and comparing passwords securely |
-| `sqlite3` | ^6.0.1 | Lightweight embedded SQL database driver |
-| `dotenv` | ^17.3.1 | Loads environment variables from the `.env` file |
-| `cors` | ^2.8.6 | Enables Cross-Origin Resource Sharing (CORS) for all origins |
+| Package        | Version | Purpose                                                      |
+|----------------|---------|--------------------------------------------------------------|
+| `express`      | ^5.2.1  | Web framework for routing and handling HTTP requests         |
+| `jsonwebtoken` | ^9.0.3  | Signing and verifying JWT tokens for user authentication     |
+| `bcrypt`       | ^6.0.0  | Hashing and comparing passwords securely                     |
+| `sqlite3`      | ^6.0.1  | Lightweight embedded SQL database driver                     |
+| `dotenv`       | ^17.3.1 | Loads environment variables from the `.env` file             |
+| `cors`         | ^2.8.6  | Enables Cross-Origin Resource Sharing (CORS) for all origins |
 
 ---
 
@@ -55,11 +55,11 @@ JWT_SECRET=
 PORT=
 ```
 
-| Variable | Required | Description |
-|---|---|---|
-| `ADMIN_PASSWORD` | ✅ Yes | A **bcrypt hash** of your chosen admin password. This is used to authenticate all `/admin/` endpoints. Generate one with `bcrypt.hash('yourpassword', 10)`. |
-| `JWT_SECRET` | ✅ Yes | A long, random secret string used to sign and verify JWT tokens. Keep this private and never commit it. |
-| `PORT` | ✅ Yes | The port the Express server will listen on (e.g. `3000`). |
+| Variable         | Required | Description                                                                                                                                                 |
+|------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ADMIN_PASSWORD` | ✅ Yes    | A **bcrypt hash** of your chosen admin password. This is used to authenticate all `/admin/` endpoints. Generate one with `bcrypt.hash('yourpassword', 10)`. |
+| `JWT_SECRET`     | ✅ Yes    | A long, random secret string used to sign and verify JWT tokens. Keep this private and never commit it.                                                     |
+| `PORT`           | ✅ Yes    | The port the Express server will listen on (e.g. `3000`).                                                                                                   |
 
 > **⚠️ Security Warning:** `ADMIN_PASSWORD` must be stored as a **bcrypt hash**, not plaintext. The server compares incoming admin passwords against this hash at runtime.
 
@@ -137,14 +137,14 @@ Registers a new user and returns an authentication token immediately upon succes
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | String | Full name of the patient |
-| `age` | Integer | Patient age. Min: `0`, Max: `200` |
-| `gender` | String | Single character : `"M"` or `"F"` (case-insensitive) |
-| `number` | String | Contact phone number |
-| `gov_id` | String | Exactly 14 characters. Must start with `2` or `3` and match gender rules |
-| `password` | String | Minimum 10 characters |
+| Field      | Type    | Description                                                              |
+|------------|---------|--------------------------------------------------------------------------|
+| `name`     | String  | Full name of the patient                                                 |
+| `age`      | Integer | Patient age. Min: `0`, Max: `200`                                        |
+| `gender`   | String  | Single character : `"M"` or `"F"` (case-insensitive)                     |
+| `number`   | String  | Contact phone number                                                     |
+| `gov_id`   | String  | Exactly 14 characters. Must start with `2` or `3` and match gender rules |
+| `password` | String  | Minimum 10 characters                                                    |
 
 **Responses:**
 * `201 Created`: `{ "status": 201, "message": "user with id X has been successfully added", "id": X, "token": "..." }`
@@ -203,10 +203,10 @@ Schedules a new appointment. The scheduling engine validates whether the slot ti
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
-| `date` | String | Format: `DD/MM/YYYY`. Must be a future date |
-| `time` | String | Format: `HH:MM` (24-hour clock) |
+| Field  | Type   | Description                                                                  |
+|--------|--------|------------------------------------------------------------------------------|
+| `date` | String | Format: `DD/MM/YYYY`. Must be a future date                                  |
+| `time` | String | Format: `HH:MM` (24-hour clock)                                              |
 | `type` | String | Clinic type : see [Clinic Typings](#-important-clinic-typings) section below |
 
 **Responses:**
@@ -256,8 +256,8 @@ Cancels either a single appointment or ALL appointments belonging to the user.
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
+| Field            | Type              | Description                                                                                                           |
+|------------------|-------------------|-----------------------------------------------------------------------------------------------------------------------|
 | `appointment_id` | Integer \| String | Required. The ID of the appointment to cancel. Pass `"*"` as a string to delete **all** appointments for this patient |
 
 **Responses:**
@@ -284,10 +284,10 @@ Fetches user data for administrative oversight.
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
-| `password` | String | Required. The admin master password |
-| `id` | Integer | The specific Patient ID to fetch. Pass `-1` to fetch **all** patients |
+| Field      | Type    | Description                                                           |
+|------------|---------|-----------------------------------------------------------------------|
+| `password` | String  | Required. The admin master password                                   |
+| `id`       | Integer | The specific Patient ID to fetch. Pass `-1` to fetch **all** patients |
 
 > **Wildcard:** Setting `id` to `-1` returns every patient in the database.
 
@@ -313,11 +313,11 @@ Fetches specific appointment data for administrative oversight.
 }
 ```
 
-| Field | Type | Description |
-|---|---|---|
-| `password` | String | Required. The admin master password |
-| `patient_id` | Integer | The patient the appointment belongs to. Set to `0` to mark as "not specified" |
-| `appointment_id` | Integer | The specific appointment ID. Set to `0` to mark as "not specified" |
+| Field            | Type    | Description                                                                   |
+|------------------|---------|-------------------------------------------------------------------------------|
+| `password`       | String  | Required. The admin master password                                           |
+| `patient_id`     | Integer | The patient the appointment belongs to. Set to `0` to mark as "not specified" |
+| `appointment_id` | Integer | The specific appointment ID. Set to `0` to mark as "not specified"            |
 
 > **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously** (at least one must be set).
 
