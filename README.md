@@ -40,6 +40,7 @@ This will install the following production dependencies declared in `package.jso
 | `bcrypt` | ^6.0.0 | Hashing and comparing passwords securely |
 | `sqlite3` | ^6.0.1 | Lightweight embedded SQL database driver |
 | `dotenv` | ^17.3.1 | Loads environment variables from the `.env` file |
+| `cors` | ^2.8.6 | Enables Cross-Origin Resource Sharing (CORS) for all origins |
 
 ---
 
@@ -91,6 +92,18 @@ Listening on port <PORT>
 
 ---
 
+## 🌐 CORS Policy
+
+This API uses the `cors` middleware with **default settings**, which means:
+
+* **All origins are allowed** — any domain may make requests to this API.
+* **All standard HTTP methods** are permitted (`GET`, `POST`, `PUT`, `DELETE`, etc.).
+* No custom origin whitelist or credentials restrictions are enforced.
+
+> **Note for production:** The current policy is open (`*`). You may want to restrict allowed origins before deploying to a public environment.
+
+---
+
 ## 🔐 Authentication
 
 This API uses **JSON Web Tokens (JWT)** for standard users.
@@ -100,6 +113,10 @@ For any endpoints that require authentication, you must include the token in you
 Authorization: Bearer <YOUR_JWT_TOKEN>
 ```
 *Note: The token will expire after **2 hours**.*
+
+**Authentication error responses (applies to all protected endpoints):**
+* `401 Unauthorized`: `{ "status": 401, "message": "Missing token credentials" }` — No token was provided.
+* `403 Forbidden`: `{ "status": 403, "message": "Invalid or expired token" }` — Token failed verification or has expired.
 
 ---
 
@@ -246,13 +263,17 @@ Fetches user data for administrative oversight.
 ```json
 {
   "password": "supersecretadminpassword", // Required: Admin master password
-  "id": 12 // Integer: The specific Patient ID to fetch
+  "id": 12 // Integer: The specific Patient ID to fetch. Pass -1 to fetch ALL patients.
 }
 ```
 
+> **Wildcard:** Setting `id` to `-1` returns every patient in the database.
+
 **Responses:**
-* `200 OK`: `{ "status": 200, "data": { ...patient details... } }`
+* `200 OK`: `{ "status": 200, "data": [ ...patient details... ] }`
+* `400 Bad Request`: `{ "status": 400, "message": "Invalid ID" }` (Non-numeric ID)
 * `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
+* `404 Not Found`: `{ "status": 404, "message": "No users found in the database" }` (Empty result)
 
 ---
 
@@ -270,12 +291,16 @@ Fetches specific appointment data for administrative oversight.
 }
 ```
 
-> **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously**  (at least one must be set).
+> **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously** (at least one must be set).
+
+> **Wildcard:** Setting either `appointment_id` or `patient_id` to `-1` returns **all appointments** in the database, ignoring the other field.
 
 **Responses:**
-* `200 OK`: `{ "status": 200, "data": { ...appointment details... } }`
+* `200 OK`: `{ "status": 200, "data": [ ...appointment details... ] }`
+* `400 Bad Request`: `{ "status": 400, "message": "Invalid ID" }` (Non-numeric ID)
 * `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
 * `404 Not Found`: `{ "status": 404, "message": "No patient or appointment was selected" }` (Both IDs were `0`)
+* `404 Not Found`: `{ "status": 404, "message": "No appointments were found" }` (Valid query returned empty results)
 
 ---
 
