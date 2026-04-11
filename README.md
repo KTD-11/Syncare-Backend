@@ -185,33 +185,12 @@ Fetches specific appointment data for administrative oversight.
 }
 ```
 
-> **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously** — at least one must be set.
+> **⚠️ ID Precedence Note:** `appointment_id` takes **precedence** over `patient_id`. If `appointment_id` is provided (non-zero), the server will look up by appointment only and will **ignore** `patient_id` entirely. Either field can be set to `0` to mark it as "not specified", but **both cannot be `0` simultaneously**  (at least one must be set).
 
 **Responses:**
 * `200 OK`: `{ "status": 200, "data": { ...appointment details... } }`
 * `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
 * `404 Not Found`: `{ "status": 404, "message": "No patient or appointment was selected" }` (Both IDs were `0`)
-
----
-
-### 3. Delete a User (Admin)
-`DELETE /admin/users/`
-
-Permanently deletes a patient record from the system. This action is irreversible and will cascade-delete all associated appointments.
-
-**Request Body:**
-```json
-{
-  "password": "supersecretadminpassword", // Required: Admin master password
-  "id": 12 // Integer: The Patient ID to delete
-}
-```
-
-**Responses:**
-* `200 OK`: `{ "status": 200, "message": "user deleted successfully" }`
-* `400 Bad Request`: `{ "status": 400, "message": "Invalid ID" }` (Non-numeric or missing ID)
-* `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
-* `404 Not Found`: `{ "status": 404, "message": "User not found" }`
 
 ---
 
