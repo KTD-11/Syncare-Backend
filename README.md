@@ -208,6 +208,7 @@ Schedules a new appointment. The scheduling engine validates whether the slot ti
 | `date` | String | Format: `DD/MM/YYYY`. Must be a future date |
 | `time` | String | Format: `HH:MM` (24-hour clock) |
 | `type` | String | Clinic type : see [Clinic Typings](#-important-clinic-typings) section below |
+
 **Responses:**
 * `201 Created`: `{ "status": 201, "message": "Appointment successfully booked at 14:30" }`
 * `400 Bad Request`: Failed basic validation formats.
