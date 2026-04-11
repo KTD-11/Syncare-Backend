@@ -142,6 +142,10 @@ function appointmentSearch(patientID) {
                 });
             }
 
+            rows.forEach((row) => {
+                delete row.appointment_type;
+            });
+
             return resolve({
                 status: 200,
                 data: rows
