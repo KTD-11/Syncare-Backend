@@ -157,7 +157,7 @@ Deletes the currently authenticated user based on their JWT token payload.
 * **Request Body:** None required.
 
 **Responses:**
-* `204 No Content`: `{ "status": 204, "message": "user deleted successfully" }`
+* `204 No Content`
 
 ---
 
