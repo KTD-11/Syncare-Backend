@@ -184,28 +184,31 @@ Schedules a new appointment. The scheduling engine validates whether the slot ti
 
 ---
 
-### 2. Fetch a Single Appointment
-`GET /appointments/:id/`
+### 2. Fetch All Appointments
+`GET /appointments/`
 
-Fetches details of a specific appointment. The appointment must belong to the authenticated user.
+Fetches all appointments belonging to the authenticated user.
 
 * **Headers Required:** `Authorization: Bearer <token>`
-* **URL Params:** `id` (integer) - The appointment ID (e.g. `/appointments/42/`)
+* **Request Body:** None required.
 
 **Responses:**
 * `200 OK`: 
 ```json
 {
   "status": 200,
-  "data": {
-     "appointment_id": 42,
-     "appointment_date": "15/05/2026",
-     "appointment_time": "14:30",
-     "appointment_type": "General Surgery"
-  }
+  "data": [
+    {
+      "appointment_id": 42,
+      "appointment_date": "15/05/2026",
+      "appointment_time": "14:30",
+      "appointment_type": "General Surgery",
+      "appointment_name": "Dr. Ahmed Hassan"
+    }
+  ]
 }
 ```
-* `404 Not Found`: `{ "status": 404, "message": "Not found" }`
+* `404 Not Found`: `{ "status": 404, "message": "Not found" }` (User has no appointments)
 
 ---
 
