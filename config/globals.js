@@ -1,3 +1,7 @@
+import 'dotenv/config';
+
+const encryptionSecret = Buffer.from(process.env.ENCYPTION_SECRET, 'hex');
+
 const GLOBAL = {
     MAXIMUM_AGE: 200,
     ZERO_INDEX_SHIFT: 1,
@@ -47,7 +51,23 @@ const GLOBAL = {
     ],
     GET_EVERYONE_INDEX: -1,
     NONE: 0,
-    TOKEN_INDEX: 1
+    TOKEN_INDEX: 1,
+    ALLOWED_NUMBER_PREFIXES: ["010", "011", "012", "015"],
+    PREFIX_STARTING_INDEX: 0,
+    PREFIX_LENGTH: 3,
+    NUMBER_LENGTH: 11,
+    LATITUDE_BOUNDARIES: {
+        MAX: 90,
+        MIN: -90
+    },
+    LONGITUDE_BOUNDARIES: {
+        MAX: 180,
+        MIN: -180
+    },
+    LOCATION_ENCRYPTION_MASTER: encryptionSecret,
+    LOCATION_ENCRYPTION_ALGORITHM: 'aes-256-gcm',
+    IV_BYTE_LENGTH: 12,
+    AUTH_TAG_BYTE_LENGTH: 16
 }
 
 export { GLOBAL }

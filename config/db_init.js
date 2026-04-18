@@ -17,7 +17,8 @@ db.run(`CREATE TABLE IF NOT EXISTS patients(
         patient_number TEXT NOT NULL UNIQUE,
         patient_age INTEGER NOT NULL,
         patient_gov_id TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL
+        password_hash TEXT NOT NULL,
+        location_string TEXT NOT NULL UNIQUE
     )`, [], (err)=>{
 
     if (err)
