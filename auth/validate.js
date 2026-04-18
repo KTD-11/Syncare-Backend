@@ -94,6 +94,48 @@ function validateTime(time){
     return `${stringHours}:${stringMinutes}`;
 }
 
+function validateNumber(number){
+    const stringifiedNumber = String(number).trim();
+
+    if (stringifiedNumber.length !== GLOBAL.NUMBER_LENGTH){
+        return null;
+    }
+
+    let flag = false;
+    GLOBAL.ALLOWED_NUMBER_PREFIXES.forEach(prefix => {
+        if (stringifiedNumber.startsWith(prefix))
+            flag = true;
+    });
+
+    if (!flag)
+        return null;
+
+    if (!/^\d+$/.test(stringifiedNumber)) {
+        return null;
+    }
+
+    return stringifiedNumber;
+}
+
+function validateLocation(lat, long){
+    const floatifiedLat = Number(lat);
+    const floatifiedLong = Number(long);
+
+    if (isNaN(floatifiedLat)  || isNaN(floatifiedLong))
+        return null;
+
+    if (floatifiedLat > GLOBAL.LATITUDE_BOUNDARIES.MAX || floatifiedLat < GLOBAL.LATITUDE_BOUNDARIES.MIN)
+        return null;
+
+    if (floatifiedLong > GLOBAL.LONGITUDE_BOUNDARIES.MAX || floatifiedLong < GLOBAL.LONGITUDE_BOUNDARIES.MIN)
+        return null;
+
+    return {
+        lat: floatifiedLat,
+        lng: floatifiedLong
+    };
+}
+
 function validateType(type){
     const normalizedType = GLOBAL.AVG_CLINIC_WAITING_TIME[type];
 
@@ -112,4 +154,4 @@ async function hashPassword(password){
 }
 
 
-export {validateAge, validateGender, validateGovID, hashPassword, validateDate, validateTime, validateType}
+export {validateAge, validateGender, validateGovID, hashPassword, validateDate, validateTime, validateType, validateNumber, validateLocation};
