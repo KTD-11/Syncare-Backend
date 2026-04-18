@@ -22,6 +22,8 @@ import * as database from "./services/database.js";
 
 import * as admin from "./services/admin.js";
 
+import * as encrypt from "./auth/encryption_utils.js";
+
 //initializing the express server
 const app = express();
 
@@ -37,8 +39,10 @@ app.post('/signup/', preprocess.preprocessRegistration, async (req, res) => {
         name: String(req.body.name).trim(),
         age: validate.validateAge(req.body.age),
         gender: gender,
-        number: String(req.body.number).replace(/\s/g, ""),
+        number: validate.validateNumber(req.body.number),
         govId: validate.validateGovID(String(req.body.gov_id), gender),
+        location: validate.validateLocation(req.body.lat, req.body.lng),
+        locationEncrypted: null,
         passwordHash: null
     };
 
@@ -64,6 +68,8 @@ app.post('/signup/', preprocess.preprocessRegistration, async (req, res) => {
         if (searchResult.status !== 200) {
             return res.status(searchResult.status).json(searchResult);
         }
+
+        dataFields.locationEncrypted = encrypt.encryptLocation(dataFields.location);
 
         const insertUser = await database.insertNewPatient(dataFields);
 

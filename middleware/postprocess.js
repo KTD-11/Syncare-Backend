@@ -29,6 +29,13 @@ function postprocessRegistration(dataFields){
         };
     }
 
+    if (dataFields.location === null){
+        return {
+            status: 400,
+            message: "Invalid location"
+        };
+    }
+
     return { status: 200 };
 }
 
