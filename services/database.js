@@ -7,15 +7,17 @@ function insertNewPatient(dataFields){
                                                      patient_number,
                                                      patient_age,
                                                      patient_gov_id,
-                                                     password_hash)
-                               VALUES (?, ?, ?, ?, ?, ?)`;
+                                                     password_hash,
+                                                     location_string)
+                               VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
         db.run(insertSql, [dataFields.name,
             dataFields.gender,
             dataFields.number,
             dataFields.age,
             dataFields.govId,
-            dataFields.passwordHash], function (err) {
+            dataFields.passwordHash,
+            dataFields.locationEncrypted], function (err) {
 
             if (err){
                 console.error(err.message);

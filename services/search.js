@@ -1,6 +1,7 @@
 import { db } from "../config/db_init.js";
 import bcrypt from "bcrypt";
 import { GLOBAL } from "../config/globals.js";
+import * as encrypt from "../auth/encryption_utils.js";
 
 function db_search(id, password, govIdSearchFlag) {
     const sql = govIdSearchFlag ?
@@ -120,36 +121,78 @@ function isAvailable(govId) {
     });
 }
 
-function appointmentSearch(patientID) {
+function getPatientLocationString(patientID){
     return new Promise(resolve => {
-        const searchSql = `SELECT appointment_id, appointment_date, appointment_time, appointment_type, appointment_name FROM
-        appointments WHERE (patient_id = ?)`;
+       const searchSql = `SELECT location_string FROM patients WHERE patient_id = ?`;
 
-        db.all(searchSql, [patientID], (err, rows) => {
-            if (err) {
-                console.error(err.message);
+       db.get(searchSql, [patientID], (err, row)=>{
+           if (err)
+               return resolve({
+                   status: 500,
+                   message: "Internal server error"
+               });
 
-                return resolve({
-                    status: 500,
-                    message: "Internal server error"
+           //no need to check for !row since by now this function is to be triggered after the
+           //patient had already been verified
+
+           return resolve({
+               status: 200,
+               data: row.location_string
+           });
+       })
+    });
+}
+
+function appointmentSearch(patientID) {
+    return new Promise ( async resolveOuter => {
+
+        const fetchAppointment = new Promise(resolveInner => {
+            const searchSql = `SELECT appointment_id, appointment_date, appointment_time, appointment_type, appointment_name FROM
+                                      appointments WHERE (patient_id = ?)`;
+
+            db.all(searchSql, [patientID], (err, rows) => {
+                if (err) {
+                    console.error(err.message);
+
+                    return resolveInner({
+                        status: 500,
+                        message: "Internal server error"
+                    });
+                }
+
+                if (rows.length === 0) {
+                    return resolveInner({
+                        status: 404,
+                        message: "Not found"
+                    });
+                }
+
+                return resolveInner({
+                    status: 200,
+                    data: rows,
                 });
-            }
-
-            if (rows.length === 0) {
-                return resolve({
-                    status: 404,
-                    message: "Not found"
-                });
-            }
-
-            rows.forEach((row) => {
-                delete row.appointment_type;
             });
+        });
 
-            return resolve({
-                status: 200,
-                data: rows
-            });
+        const [locationString, appointments] =
+            await Promise.all([getPatientLocationString(patientID), fetchAppointment]);
+
+        if (locationString.status === 500) {
+            console.error("Failed to fetch location_string");
+            return resolveOuter(locationString);
+        }
+
+        if (appointments.status !== 200)
+            return resolveOuter(appointments)
+
+        appointments.data.forEach(appointment => {
+            delete appointment.appointment_type;
+        });
+
+        return resolveOuter({
+            status: 200,
+            data: appointments.data,
+            location: encrypt.decryptLocation(locationString.data)
         });
     });
 }
