@@ -3,20 +3,19 @@ import bcrypt from "bcrypt";
 import { GLOBAL } from "../config/globals.js";
 import * as encrypt from "../auth/encryption_utils.js";
 
-function db_search(id, password, govIdSearchFlag) {
-    const sql = govIdSearchFlag ?
-        "SELECT * FROM patients WHERE patient_gov_id = ?"
-        : "SELECT * FROM patients WHERE patient_id = ?";
+function db_search(id, password, govIdSearchFlag, staff) {
+    const sql = staff ?
+        "SELECT * FROM doctors WHERE doctor_auth_id = ?"
+        : govIdSearchFlag ?
+            "SELECT * FROM patients WHERE patient_gov_id = ?"
+            : "SELECT * FROM patients WHERE patient_id = ?";
 
     return new Promise((resolve) => {
         db.get(sql, [id], async (err, row) => {
             if (err) {
                 console.error(err.message);
 
-                return resolve({
-                    status: 500,
-                    message: "Internal server error"
-                });
+                return resolve(GLOBAL.ERROR_OBJECT);
             }
 
             if (!row) {
@@ -59,10 +58,7 @@ function db_search(id, password, govIdSearchFlag) {
             } catch (err) {
                 console.error(err.message);
 
-                return resolve({
-                    status: 500,
-                    message: "Internal server error"
-                });
+                return resolve(GLOBAL.ERROR_OBJECT);
             }
         });
     });
@@ -78,10 +74,7 @@ function booked_appointment_search(date) {
             if (err) {
                 console.error(err.message);
 
-                return resolve({
-                    status: 500,
-                    message: "Internal server error"
-                });
+                return resolve(GLOBAL.ERROR_OBJECT);
             }
 
             return resolve({
@@ -92,18 +85,15 @@ function booked_appointment_search(date) {
     });
 }
 
-function isAvailable(govId) {
-    const sql = "SELECT * FROM patients WHERE patient_gov_id = ?";
+function isAvailable(Id, staff) {
+    const sql = staff ? "SELECT * FROM doctors WHERE doctor_auth_id = ?" :  "SELECT * FROM patients WHERE patient_gov_id = ?";
 
     return new Promise(resolve => {
-        db.get(sql, [govId], (err, row) => {
+        db.get(sql, [Id], (err, row) => {
             if (err) {
                 console.error(err);
 
-                return resolve({
-                    status: 500,
-                    message: "Internal server error"
-                });
+                return resolve(GLOBAL.ERROR_OBJECT);
             }
 
             if (!row) {
@@ -127,10 +117,7 @@ function getPatientLocationString(patientID){
 
        db.get(searchSql, [patientID], (err, row)=>{
            if (err)
-               return resolve({
-                   status: 500,
-                   message: "Internal server error"
-               });
+               return resolve(GLOBAL.ERROR_OBJECT);
 
            //no need to check for !row since by now this function is to be triggered after the
            //patient had already been verified
@@ -192,14 +179,77 @@ function appointmentSearch(patientID) {
         return resolveOuter({
             status: 200,
             data: appointments.data,
-            location: encrypt.decryptLocation(locationString.data)
+            location: encrypt.decrypt(locationString.data)
         });
     });
 }
 
-async function userExists(govID) {
-    const result = await isAvailable(govID);
+async function userExists(ID, staff) {
+    const result = await isAvailable(ID, staff);
     return result.status === 409;
 }
 
-export { db_search, booked_appointment_search, isAvailable, appointmentSearch, userExists }
+async function availableDoctor(specialty){
+    return new Promise(resolve => {
+        const searchSql = `SELECT * FROM doctors
+                              WHERE doctor_specialty = ?
+                              ORDER BY assigned_patients ASC
+                              LIMIT 1`;
+
+        db.all(searchSql,[specialty], (err, rows)=>{
+            if (err) {
+                console.error(err.message)
+                return resolve(GLOBAL.ERROR_OBJECT);
+            }
+
+            if (rows.length === 0)
+                return resolve({
+                    status: 404,
+                    message: "No doctors are available for this specialty at this moment"
+                });
+
+            return resolve({
+                status: 200,
+                data: rows[GLOBAL.FIRST_AVAILABLE_DOCTOR]
+            });
+        })
+    });
+}
+function doctorFetchAppointments(id){
+    return new Promise(resolve => {
+        const searchSql = `
+            SELECT
+                a.*,
+                p.patient_name,
+                p.patient_gender,
+                p.patient_number,
+                p.patient_age
+            FROM appointments a
+                     LEFT JOIN patients p ON a.patient_id = p.patient_id
+            WHERE (a.doctor_id = ? AND a.status = 0)
+        `;
+
+        db.all(searchSql, [id], (err, rows) => {
+            if (err) {
+                console.error(err.message)
+                return resolve(GLOBAL.ERROR_OBJECT);
+            }
+
+            if (rows.length === 0) {
+                return resolve({
+                    status: 404,
+                    message: "No appointed patients found"
+                });
+            }
+
+            return resolve({
+                status: 200,
+                data: rows
+            });
+        });
+    });
+}
+
+
+export { db_search, booked_appointment_search, isAvailable, appointmentSearch, userExists,
+        availableDoctor, doctorFetchAppointments}
