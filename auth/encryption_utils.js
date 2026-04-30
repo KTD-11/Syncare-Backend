@@ -2,8 +2,8 @@ import * as crypto from "node:crypto";
 import { GLOBAL } from "../config/globals.js";
 
 
-function encryptLocation(location){
-    const locationString = JSON.stringify(location);
+function encrypt(string){
+    const toBeEncryptedString = JSON.stringify(string);
 
     const initializationVector = crypto.randomBytes(GLOBAL.IV_BYTE_LENGTH);
 
@@ -13,7 +13,7 @@ function encryptLocation(location){
                                                     {authTagLength: GLOBAL.AUTH_TAG_BYTE_LENGTH}
     );
 
-    let encryptedData = cypherInstance.update(locationString, 'utf-8', 'hex');
+    let encryptedData = cypherInstance.update(toBeEncryptedString, 'utf-8', 'hex');
     encryptedData += cypherInstance.final('hex');
 
     const authTag = cypherInstance.getAuthTag().toString('hex');
@@ -21,7 +21,7 @@ function encryptLocation(location){
     return `${initializationVector.toString('hex')}:${encryptedData}:${authTag}`;
 }
 
-function decryptLocation(encryptedString){
+function decrypt(encryptedString){
     const [initializationVectorHEX, encryptedData, authTagHEX] = encryptedString.split(':');
 
     const initializationVectorBYTES = Buffer.from(initializationVectorHEX, 'hex');
@@ -41,4 +41,4 @@ function decryptLocation(encryptedString){
     return JSON.parse(decryptedData);
 }
 
-export {encryptLocation, decryptLocation};
+export {encrypt, decrypt};

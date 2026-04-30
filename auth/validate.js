@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 
 import { GLOBAL } from "../config/globals.js";
 
-function validateAge(age){
+function validateAge(age) {
     const ageInt = parseInt(age);
 
     if (isNaN(ageInt) || ageInt > GLOBAL.MAXIMUM_AGE || ageInt < 0)
@@ -11,7 +11,7 @@ function validateAge(age){
     return ageInt;
 }
 
-function validateGender(gender){
+function validateGender(gender) {
     const normalizedGender = String(gender).toUpperCase();
 
     if (normalizedGender !== "M" && normalizedGender !== "F")
@@ -20,8 +20,8 @@ function validateGender(gender){
     return normalizedGender;
 }
 
-function validateGovID(govID, gender){
-    if (gender === null){
+function validateGovID(govID, gender) {
+    if (gender === null) {
         return null;
     }
 
@@ -29,19 +29,19 @@ function validateGovID(govID, gender){
         return null;
     }
 
-    if (parseInt(govID[0]) !== GLOBAL.GOV_ID_PREFIXES[0] && parseInt(govID[0]) !== GLOBAL.GOV_ID_PREFIXES[1]){
+    if (parseInt(govID[0]) !== GLOBAL.GOV_ID_PREFIXES[0] && parseInt(govID[0]) !== GLOBAL.GOV_ID_PREFIXES[1]) {
         return null;
     }
 
     if ((gender === 'F' && String(govID)[GLOBAL.GOV_ID_GENDER_IDENTIFIER_INDEX] % 2 !== 0) ||
-        (gender === 'M' && String(govID)[GLOBAL.GOV_ID_GENDER_IDENTIFIER_INDEX] % 2 === 0)){
+        (gender === 'M' && String(govID)[GLOBAL.GOV_ID_GENDER_IDENTIFIER_INDEX] % 2 === 0)) {
         return null;
     }
 
     return govID.trim();
 }
 
-function validateDate(date){
+function validateDate(date) {
     const currentDate = new Date();
 
     let normalizedDate = String(date).split('/');
@@ -73,7 +73,7 @@ function validateDate(date){
     return String(date);
 }
 
-function validateTime(time){
+function validateTime(time) {
     const normalizedTime = String(time).split(':');
 
     const hours = parseInt(normalizedTime[GLOBAL.TIME_INDEX.HOUR]);
@@ -94,10 +94,10 @@ function validateTime(time){
     return `${stringHours}:${stringMinutes}`;
 }
 
-function validateNumber(number){
+function validateNumber(number) {
     const stringifiedNumber = String(number).trim();
 
-    if (stringifiedNumber.length !== GLOBAL.NUMBER_LENGTH){
+    if (stringifiedNumber.length !== GLOBAL.NUMBER_LENGTH) {
         return null;
     }
 
@@ -117,11 +117,11 @@ function validateNumber(number){
     return stringifiedNumber;
 }
 
-function validateLocation(lat, long){
+function validateLocation(lat, long) {
     const floatifiedLat = Number(lat);
     const floatifiedLong = Number(long);
 
-    if (isNaN(floatifiedLat)  || isNaN(floatifiedLong))
+    if (isNaN(floatifiedLat) || isNaN(floatifiedLong))
         return null;
 
     if (floatifiedLat > GLOBAL.LATITUDE_BOUNDARIES.MAX || floatifiedLat < GLOBAL.LATITUDE_BOUNDARIES.MIN)
@@ -136,7 +136,7 @@ function validateLocation(lat, long){
     };
 }
 
-function validateType(type){
+function validateType(type) {
     const normalizedType = GLOBAL.AVG_CLINIC_WAITING_TIME[type];
 
     if (normalizedType === undefined)
@@ -145,13 +145,49 @@ function validateType(type){
     return normalizedType;
 }
 
-async function hashPassword(password){
-    if (password.length < GLOBAL.PASSWORD_MIN_LENGTH){
+async function hashPassword(password) {
+    if (password.length < GLOBAL.PASSWORD_MIN_LENGTH) {
         return null;
     }
 
     return await bcrypt.hash(password, GLOBAL.SALT_ROUNDS);
 }
 
+function validateSpecialty(specialty) {
+    const normalizedSpecialty = String(specialty).trim();
+    let flag = false;
 
-export {validateAge, validateGender, validateGovID, hashPassword, validateDate, validateTime, validateType, validateNumber, validateLocation};
+    GLOBAL.AVAILABLE_CLINICS.forEach(clinic => {
+        if (clinic === normalizedSpecialty)
+            flag = true;
+    });
+
+    return flag ? normalizedSpecialty : null;
+}
+
+function validateAuthId(authID) {
+    const normalizedAuthID = parseInt(authID);
+
+    if (isNaN(normalizedAuthID))
+        return null;
+
+    return String(normalizedAuthID);
+}
+
+function validateReportType(type) {
+    const normalizedType = String(type).trim();
+
+    let flag = false;
+
+    GLOBAL.REPORT_TYPES.forEach(reportType => {
+        if (reportType === normalizedType)
+            flag = true;
+    });
+
+    return flag ? normalizedType : null;
+}
+
+export {
+    validateAge, validateGender, validateGovID, hashPassword, validateDate, validateTime,
+    validateType, validateNumber, validateLocation, validateSpecialty, validateAuthId, validateReportType
+};
