@@ -67,7 +67,16 @@ const GLOBAL = {
     LOCATION_ENCRYPTION_MASTER: encryptionSecret,
     LOCATION_ENCRYPTION_ALGORITHM: 'aes-256-gcm',
     IV_BYTE_LENGTH: 12,
-    AUTH_TAG_BYTE_LENGTH: 16
+    AUTH_TAG_BYTE_LENGTH: 16,
+    MIN_AUTH_ID_LENGTH: 10,
+    INITIAL_ASSIGNED_PATIENTS: 0,
+    FIRST_AVAILABLE_DOCTOR: 0,
+    APPOINTMENT_NOT_DONE: 0,
+    REPORT_TYPES: ["Radiology", "Clinical Results", "Medical Assessment"],
+    ERROR_OBJECT: {
+        status: 500,
+        message: "Internal server error"
+    },
 }
 
 export { GLOBAL }
