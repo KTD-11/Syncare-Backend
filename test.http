@@ -1,5 +1,15 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=WebStorm
+
+POST http://localhost:2002/admin/add_new_doctor
+Content-Type: application/json
+
+{
+  "name": "William Davies",
+  "specialty": "Ear, Nose, and Throat",
+  "auth_id": "00000012",
+  "gender": "M",
+  "password": "password012",
+  "admin_password": "IFYOUCANREADTHISTHENIAMFUCKED"
+}
+
 
 ###

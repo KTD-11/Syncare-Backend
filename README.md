@@ -1,7 +1,7 @@
 
-# Syncare Frontend API Documentation
+# Syncare Backend API Documentation
 
-Welcome to the frontend API documentation for the **Syncare** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
+Welcome to the backend API documentation for the **Syncare** backend. This document outlines the available endpoints, expected request structures, authentication mechanisms, and response formats to help you correctly integrate the frontend with this service.
 
 ---
 
@@ -109,7 +109,7 @@ This API uses the `cors` middleware with **default settings**, which means:
 
 ## 🔐 Authentication
 
-This API uses **JSON Web Tokens (JWT)** for standard users.
+This API uses **JSON Web Tokens (JWT)** for standard users (patients and doctors).
 For any endpoints that require authentication, you must include the token in your requests via the `Authorization` header:
 
 ```http
@@ -126,7 +126,7 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 ## 👤 Users & Authentication Endpoints
 
 ### 1. Register a new Patient
-`POST /signup/`
+`POST /patient/signup/`
 
 Registers a new user and returns an authentication token immediately upon success. Patient location coordinates are **encrypted at rest** using AES-256-GCM before being stored in the database.
 
@@ -146,7 +146,7 @@ Registers a new user and returns an authentication token immediately upon succes
 
 | Field      | Type    | Description                                                                                         |
 |------------|---------|-----------------------------------------------------------------------------------------------------|
-| `name`     | String  | Full name of the patient                                                                            |
+| `name`     | String  | Full name of the patient. Must contain only letters (A-Z)                                           |
 | `age`      | Integer | Patient age. Min: `0`, Max: `200`                                                                   |
 | `gender`   | String  | Single character : `"M"` or `"F"` (case-insensitive)                                               |
 | `number`   | String  | Egyptian mobile number. Must be exactly **11 digits** and start with `010`, `011`, `012`, or `015` |
@@ -167,26 +167,34 @@ Registers a new user and returns an authentication token immediately upon succes
 ### 2. Sign In
 `POST /signin/`
 
-Authenticates a user and returns their initial data and a JWT token.
+Authenticates a user (patient or doctor) and returns their profile data and a JWT token.
 
 **Request Body:**
 ```json
 {
-  "gov_id": "29876543210987",
-  "password": "supersecretpassword"
+  "auth_id": "29876543210987",
+  "password": "supersecretpassword",
+  "staff": false
 }
 ```
 
+| Field      | Type    | Description                                                                 |
+|------------|---------|-----------------------------------------------------------------------------|
+| `auth_id`  | String  | The user's identifier — `gov_id` for patients, `auth_id` for doctors       |
+| `password` | String  | The user's password (plaintext; compared against bcrypt hash)               |
+| `staff`    | Boolean | Set to `false` for patient login, `true` for doctor login                  |
+
 **Responses:**
-* `200 OK`: `{ "status": 200, "data": { "patient_id": X, "patient_name": "...", "patient_gender": "..." }, "token": "..." }`
+* `200 OK` (Patient): `{ "status": 200, "data": { "patient_id": X, "patient_name": "...", "patient_gender": "...", ... }, "token": "..." }`
+* `200 OK` (Doctor): `{ "status": 200, "data": { "doctor_id": X, "doctor_name": "...", "doctor_specialty": "...", ... }, "token": "..." }`
 * `401 Unauthorized`: `{ "status": 401, "message": "Invalid Credentials" }`
 
 ---
 
-### 3. Delete Account
-`DELETE /remove/`
+### 3. Delete Patient Account
+`DELETE /patient/remove/`
 
-Permanently deletes the currently authenticated user's account and all associated data, based on their JWT token payload.
+Permanently deletes the currently authenticated patient's account based on their JWT token payload.
 
 * **Headers Required:** `Authorization: Bearer <token>`
 * **Request Body:** None required.
@@ -197,12 +205,12 @@ Permanently deletes the currently authenticated user's account and all associate
 
 ---
 
-## 📅 Appointments
+## 📅 Appointments (Patient)
 
 ### 1. Book an Appointment
-`POST /book/`
+`POST /patient/book/`
 
-Schedules a new appointment. The scheduling engine (`main.exe`) determines the exact slot time based on the requested time, the clinic's average waiting duration, and existing bookings for that day.
+Schedules a new appointment. The scheduling engine (`main.exe`) determines the exact slot time based on the requested time, the clinic's average waiting duration, and existing bookings for that day. A doctor is automatically assigned based on specialty and current workload (least busy doctor first).
 
 * **Headers Required:** `Authorization: Bearer <token>`
 
@@ -225,14 +233,15 @@ Schedules a new appointment. The scheduling engine (`main.exe`) determines the e
 * `201 Created`: `{ "status": 201, "message": "Appointment successfully booked at 14:30", "appointmentID": X }`
 * `400 Bad Request`: Failed basic validation (invalid date, time, or clinic type).
 * `404 Not Found`: `{ "status": 404, "message": "User not found" }` (JWT references a deleted account)
+* `404 Not Found`: `{ "status": 404, "message": "No doctors are available for this specialty at this moment" }` (No doctors registered for the requested clinic)
 * `500 Internal Server Error`: `{ "status": 500, "message": "Scheduling engine failed to process the request; day may be fully booked." }` (All slots for the day are taken)
 
 ---
 
-### 2. Fetch All Appointments
-`GET /appointments/`
+### 2. Fetch All Patient Appointments
+`GET /patient/appointments/`
 
-Fetches all appointments belonging to the authenticated user, along with the patient's decrypted location.
+Fetches all appointments belonging to the authenticated patient, along with the patient's decrypted location.
 
 * **Headers Required:** `Authorization: Bearer <token>`
 * **Request Body:** None required.
@@ -272,9 +281,9 @@ Fetches all appointments belonging to the authenticated user, along with the pat
 ---
 
 ### 3. Cancel an Appointment
-`POST /cancel/`
+`POST /patient/cancel/`
 
-Cancels either a single appointment or ALL appointments belonging to the authenticated user.
+Cancels either a single appointment or ALL appointments belonging to the authenticated patient.
 
 * **Headers Required:** `Authorization: Bearer <token>`
 
@@ -297,32 +306,145 @@ Cancels either a single appointment or ALL appointments belonging to the authent
 
 ---
 
+### 4. Get Clinical Report
+`GET /patient/report/:appointmentID`
+
+Retrieves the decrypted clinical report for a specific appointment belonging to the authenticated patient.
+
+* **Headers Required:** `Authorization: Bearer <token>`
+* **URL Parameter:** `appointmentID` — The numeric ID of the appointment
+
+**Responses:**
+* `200 OK`:
+```json
+{
+  "status": 200,
+  "data": {
+    "reportType": "Radiology",
+    "reportBody": "Results show normal findings..."
+  }
+}
+```
+* `400 Bad Request`: `{ "status": 400, "message": "Invalid appointment id" }` or `{ "status": 400, "message": "Invalid patient id" }`
+* `400 Bad Request`: `{ "status": 400, "message": "no report found" }` (No clinical results uploaded yet)
+
+---
+
+## 🩺 Doctor Endpoints
+
+Doctor endpoints require a JWT Bearer token obtained via the `/signin/` endpoint with `staff: true`.
+
+### 1. Fetch Assigned Patients
+`GET /doctor/patients/`
+
+Returns all pending (undone) appointments assigned to the authenticated doctor, including patient details.
+
+* **Headers Required:** `Authorization: Bearer <token>`
+* **Request Body:** None required.
+
+**Responses:**
+* `200 OK`:
+```json
+{
+  "status": 200,
+  "data": [
+    {
+      "appointment_id": 42,
+      "appointment_date": "15/05/2026",
+      "appointment_time": "14:30",
+      "appointment_type": "General Surgery",
+      "appointment_name": "General Surgery",
+      "patient_id": 7,
+      "doctor_id": 3,
+      "status": 0,
+      "clinical_results": null,
+      "patient_name": "John Doe",
+      "patient_gender": "M",
+      "patient_number": "01012345678",
+      "patient_age": 30
+    }
+  ]
+}
+```
+* `404 Not Found`: `{ "status": 404, "message": "No appointed patients found" }`
+
+---
+
+### 2. Toggle Appointment Status
+`PATCH /doctor/updateappointment/:appointmentID`
+
+Toggles the completion status of an appointment (0 ↔ 1). Only the doctor assigned to the appointment can update it.
+
+* **Headers Required:** `Authorization: Bearer <token>`
+* **URL Parameter:** `appointmentID` — The numeric ID of the appointment
+
+**Responses:**
+* `204 No Content`: Status toggled successfully.
+* `400 Bad Request`: `{ "status": 400, "message": "Invalid appointment ID" }` (Non-numeric ID)
+* `404 Not Found`: `{ "status": 404, "message": "No available appointments to update" }` (Appointment not found or not assigned to this doctor)
+
+---
+
+### 3. Submit Clinical Report
+`PATCH /doctor/sendreport/`
+
+Uploads an encrypted clinical report for a specific appointment. Only the assigned doctor can submit reports.
+
+* **Headers Required:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "appointment_id": 42,
+  "type": "Radiology",
+  "report": "Patient shows normal cardiac function..."
+}
+```
+
+| Field            | Type    | Description                                                                        |
+|------------------|---------|------------------------------------------------------------------------------------|
+| `appointment_id` | Integer | The ID of the appointment to attach the report to. Must be ≥ 0                    |
+| `type`           | String  | Report type. Must be one of: `"Radiology"`, `"Clinical Results"`, `"Medical Assessment"` |
+| `report`         | String  | The report body text. Cannot be empty                                              |
+
+**Responses:**
+* `204 No Content`: Report submitted successfully.
+* `400 Bad Request`: `{ "status": 400, "message": "Invalid report type" }` or `{ "status": 400, "message": "Invalid report body" }` or `{ "status": 400, "message": "Invalid appointment ID" }`
+* `404 Not Found`: `{ "status": 404, "message": "couldn't update appointment" }` (Appointment not found or not assigned to this doctor)
+
+---
+
 ## 🛡️ Admin Endpoints
 
 Admin routes **do not** require a JWT Bearer token. Instead, they require the secure `ADMIN_PASSWORD` to be passed directly in the request body.
 
-### 1. Fetch Patient Data
+### 1. Fetch User Data
 `POST /admin/users/`
 
-Fetches user data for administrative oversight.
+Fetches user data for administrative oversight. Can query either the **patients** or **doctors** table depending on the `staff` flag.
 
 **Request Body:**
 ```json
 {
   "password": "supersecretadminpassword",
-  "id": 12
+  "id": 12,
+  "staff": false
 }
 ```
 
-| Field      | Type    | Description                                                           |
-|------------|---------|-----------------------------------------------------------------------|
-| `password` | String  | Required. The admin master password (plaintext; compared to hash)     |
-| `id`       | Integer | The specific Patient ID to fetch. Pass `-1` to fetch **all** patients |
+| Field      | Type    | Description                                                                                          |
+|------------|---------|------------------------------------------------------------------------------------------------------|
+| `password` | String  | Required. The admin master password (plaintext; compared to hash)                                    |
+| `id`       | Integer | The specific user ID to fetch. Pass `-1` to fetch **all** users of the selected type                 |
+| `staff`    | Boolean | Required. Set to `false` to query the **patients** table, or `true` to query the **doctors** table   |
 
-> **Wildcard:** Setting `id` to `-1` returns every patient in the database.
+> **Wildcard:** Setting `id` to `-1` returns every user of the selected type (all patients or all doctors).
+
+> **Note:** When `staff` is `true`, the `id` maps to `doctor_id`. When `staff` is `false`, the `id` maps to `patient_id`.
 
 **Responses:**
-* `200 OK`: `{ "status": 200, "data": [ ...patient details... ] }`
+* `200 OK`: `{ "status": 200, "data": [ ...user details... ] }`
+* `400 Bad Request`: `{ "status": 400, "message": "Missing credentials" }` (Missing `id`, `password`, or `staff`)
 * `400 Bad Request`: `{ "status": 400, "message": "Invalid ID" }` (Non-numeric ID)
 * `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
 * `404 Not Found`: `{ "status": 404, "message": "No users found in the database" }` (Empty result)
@@ -362,12 +484,71 @@ Fetches specific appointment data for administrative oversight.
 
 ---
 
+### 3. Add a New Doctor
+`POST /admin/add_new_doctor/`
+
+Registers a new doctor in the system. Requires admin authorization.
+
+**Request Body:**
+```json
+{
+  "name": "Jane",
+  "specialty": "Heart Clinic",
+  "auth_id": "1234567890",
+  "gender": "F",
+  "password": "doctorsecretpassword",
+  "admin_password": "supersecretadminpassword"
+}
+```
+
+| Field            | Type   | Description                                                                        |
+|------------------|--------|------------------------------------------------------------------------------------|
+| `name`           | String | Doctor's name. Must contain only letters (A-Z)                                     |
+| `specialty`      | String | Must be one of the valid clinic types (see [Clinic Typings](#-important-clinic-typings)) |
+| `auth_id`        | String | A numeric identifier for the doctor (used for sign-in)                             |
+| `gender`         | String | `"M"` or `"F"` (case-insensitive)                                                 |
+| `password`       | String | Doctor's login password. Minimum **10 characters**                                 |
+| `admin_password` | String | The admin master password (plaintext; compared to hash)                            |
+
+**Responses:**
+* `201 Created`: `{ "status": 201, "message": "user with id X has been successfully added", "id": X, "token": "..." }`
+* `400 Bad Request`: `{ "status": 400, "message": "Missing data-fields..." }` (Failed validation)
+* `400 Bad Request`: `{ "status": 400, "message": "Passwords must be longer than 10 characters" }`
+* `409 Conflict`: `{ "status": 409, "message": "User was found" }` (Auth ID already taken)
+
+---
+
+### 4. Remove a Doctor
+`POST /admin/remove_doctor/`
+
+Removes a doctor from the system. Any appointments assigned to the doctor will have their `doctor_id` set to `NULL` (orphaned back to the queue).
+
+**Request Body:**
+```json
+{
+  "password": "supersecretadminpassword",
+  "id": 3
+}
+```
+
+| Field      | Type    | Description                                                       |
+|------------|---------|-------------------------------------------------------------------|
+| `password` | String  | Required. The admin master password (plaintext; compared to hash) |
+| `id`       | Integer | The doctor's `doctor_id` to remove                                |
+
+**Responses:**
+* `200 OK`: `{ "status": 200, "message": "Doctor deleted and assigned patients sent back to queue" }`
+* `401 Unauthorized`: `{ "status": 401, "message": "Invalid credentials" }` (Wrong admin password)
+* `404 Not Found`: `{ "status": 404, "message": "Doctor not found or already deleted" }`
+
+---
+
 ## 📋 Important Clinic Typings
 
-When making a request to `POST /book/`, your frontend dropdowns or selectors *must* submit the exact strings listed below for the `type` field. These map to the backend's `AVG_CLINIC_WAITING_TIME` durations used by the scheduling engine:
+When making a request to `POST /patient/book/`, your frontend dropdowns or selectors *must* submit the exact strings listed below for the `type` field. These map to the backend's `AVG_CLINIC_WAITING_TIME` durations used by the scheduling engine:
 
 | Clinic Name               | Avg. Slot Duration |
-|---------------------------|--------------------|
+|---------------------------|-------------------|
 | `"Adult General Medicine"` | 30 minutes        |
 | `"General Surgery"`        | 15 minutes        |
 | `"Women's Health"`         | 30 minutes        |
@@ -379,3 +560,15 @@ When making a request to `POST /book/`, your frontend dropdowns or selectors *mu
 | `"Skin Clinic"`            | 30 minutes        |
 | `"Cancer Care"`            | 30 minutes        |
 | `"Ear, Nose, and Throat"`  | 15 minutes        |
+
+---
+
+## 📝 Report Types
+
+When submitting a clinical report via `PATCH /doctor/sendreport/`, the `type` field must be one of:
+
+| Report Type           |
+|-----------------------|
+| `"Radiology"`         |
+| `"Clinical Results"`  |
+| `"Medical Assessment"`|
