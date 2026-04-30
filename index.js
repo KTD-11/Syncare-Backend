@@ -22,7 +22,7 @@ app.use("/patient", patientRouter.router);
 
 app.use("/admin", adminRouter.router);
 
-app.use("/doctor/", doctorRouter.router)
+app.use("/doctor", doctorRouter.router)
 
 app.use("/", generalRouter.router);
 

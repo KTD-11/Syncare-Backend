@@ -18,7 +18,7 @@ router.post('/signin/', preprocess.preprocessFetchUsers, async (req, res) => {
     };
 
     try {
-        const searchResults = await search.db_search(authTokens.authId, authTokens.password, false, req.body.staff);
+        const searchResults = await search.db_search(authTokens.authId, authTokens.password, true, req.body.staff);
 
         if (searchResults.status !== 200)
             return res.status(searchResults.status).json(searchResults);

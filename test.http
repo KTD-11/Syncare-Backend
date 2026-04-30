@@ -1,15 +1,11 @@
 
-POST http://localhost:2002/admin/add_new_doctor
+POST http://localhost:2002/admin/users
 Content-Type: application/json
 
 {
-  "name": "William Davies",
-  "specialty": "Ear, Nose, and Throat",
-  "auth_id": "00000012",
-  "gender": "M",
-  "password": "password012",
-  "admin_password": "IFYOUCANREADTHISTHENIAMFUCKED"
+  "password": "IFYOUCANREADTHISTHENIAMFUCKED",
+  "id": -1,
+  "staff": false
 }
-
 
 ###

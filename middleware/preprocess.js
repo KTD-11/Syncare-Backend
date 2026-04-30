@@ -2,7 +2,7 @@ import { GLOBAL } from "../config/globals.js";
 import jwt from "jsonwebtoken";
 
 function preprocessRegistration(req, res, next) {
-    if (!req.body.name || req.body.name === "" || !/^[A-Za-z]+$/.test(req.body.name) || !req.body.age || !req.body.number || !req.body.gov_id || !req.body.gender || !req.body.password || !req.body.lat || !req.body.lng) {
+    if (!req.body.name || req.body.name === "" || !/^[A-Za-z '-]+$/.test(req.body.name) || !req.body.age || !req.body.number || !req.body.gov_id || !req.body.gender || !req.body.password || !req.body.lat || !req.body.lng) {
         return res.status(400).json({
             status: 400,
             message: "Missing data-fields. Please check your data"
