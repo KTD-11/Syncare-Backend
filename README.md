@@ -78,7 +78,15 @@ PORT=3000
 
 ---
 
-### 4. Run the Server
+
+### 4. Compile the .c file
+
+```bash
+gcc ./auth/main.c -o ./auth/main
+```
+---
+
+### 5. Run the Server
 
 ```bash
 node index.js
