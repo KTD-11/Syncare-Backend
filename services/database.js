@@ -222,7 +222,14 @@ function pushReport(dataFields) {
 
 function patientGetReport(dataFields) {
     return new Promise(resolve => {
-        const searchSql = `SELECT clinical_results FROM appointments WHERE (patient_id = ? AND appointment_id = ?)`;
+        const searchSql = `SELECT
+                                        a.*,
+                                        p.patient_name,
+                                        d.doctor_name
+                                        
+                                        FROM appointments a
+                                            LEFT JOIN patients p ON a.patient_id = p.patient_id
+                                            LEFT JOIN doctors d ON a.doctor_id = d.doctor_id;`;
 
         db.get(searchSql, [dataFields.patientId, dataFields.appointmentId], (err, row) => {
             if (err) {
@@ -238,13 +245,13 @@ function patientGetReport(dataFields) {
                 });
             }
 
-            const decryptedData = decrypt(row.clinical_results);
+            row.clinical_results = decrypt(row.clinical_results);
 
             return resolve({
                 status: 200,
-                data: decryptedData
-            })
-        })
+                data: row
+            });
+        });
     });
 }
 
