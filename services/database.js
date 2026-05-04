@@ -222,14 +222,13 @@ function pushReport(dataFields) {
 
 function patientGetReport(dataFields) {
     return new Promise(resolve => {
-        const searchSql = `SELECT
-                                        a.*,
-                                        p.patient_name,
-                                        d.doctor_name
-                                        
-                                        FROM appointments a
-                                            LEFT JOIN patients p ON a.patient_id = p.patient_id
-                                            LEFT JOIN doctors d ON a.doctor_id = d.doctor_id;`;
+         const searchSql = `
+            SELECT a.*, p.patient_name, p.patient_age, p.patient_gender, d.doctor_name
+            FROM appointments a
+            LEFT JOIN patients p ON a.patient_id = p.patient_id
+            LEFT JOIN doctors d ON a.doctor_id = d.doctor_id
+            WHERE a.patient_id = ? AND a.appointment_id = ?;
+        `;
 
         db.get(searchSql, [dataFields.patientId, dataFields.appointmentId], (err, row) => {
             if (err) {
