@@ -309,7 +309,7 @@ Cancels either a single appointment or ALL appointments belonging to the authent
 ### 4. Get Clinical Report
 `GET /patient/report/:appointmentID`
 
-Retrieves the decrypted clinical report for a specific appointment belonging to the authenticated patient.
+Retrieves the full appointment record — including decrypted clinical results and associated patient/doctor details — for a specific appointment belonging to the authenticated patient.
 
 * **Headers Required:** `Authorization: Bearer <token>`
 * **URL Parameter:** `appointmentID` — The numeric ID of the appointment
@@ -320,11 +320,41 @@ Retrieves the decrypted clinical report for a specific appointment belonging to 
 {
   "status": 200,
   "data": {
-    "reportType": "Radiology",
-    "reportBody": "Results show normal findings..."
+    "appointment_id": 42,
+    "appointment_date": "15/05/2026",
+    "appointment_time": "14:30",
+    "appointment_type": "General Surgery",
+    "patient_id": 7,
+    "doctor_id": 3,
+    "appointment_name": "General Surgery",
+    "status": 1,
+    "clinical_results": {
+      "reportType": "Radiology",
+      "reportBody": "Results show normal findings..."
+    },
+    "patient_name": "John Doe",
+    "doctor_name": "Jane"
   }
 }
 ```
+
+| Response Field              | Type    | Description                                                        |
+|-----------------------------|---------|--------------------------------------------------------------------|
+| `data.appointment_id`       | Integer | Unique ID of the appointment                                       |
+| `data.appointment_date`     | String  | Date of the appointment in `DD/MM/YYYY` format                     |
+| `data.appointment_time`     | String  | Scheduled time in `HH:MM` format                                   |
+| `data.appointment_type`     | String  | Clinic type submitted at booking                                   |
+| `data.patient_id`           | Integer | ID of the patient who owns the appointment                         |
+| `data.doctor_id`            | Integer | ID of the assigned doctor (may be `null` if doctor was removed)    |
+| `data.appointment_name`     | String  | Clinic name (the specialty submitted at booking)                   |
+| `data.status`               | Integer | Completion status (`0` = pending, `1` = done)                      |
+| `data.clinical_results`     | Object  | Decrypted clinical report object                                   |
+| `data.clinical_results.reportType` | String | One of `"Radiology"`, `"Clinical Results"`, `"Medical Assessment"` |
+| `data.clinical_results.reportBody` | String | The report body text                                         |
+| `data.patient_name`         | String  | Full name of the patient (joined from patients table)              |
+| `data.doctor_name`          | String  | Name of the assigned doctor (joined from doctors table)            |
+| `data.doctor_specialty`     | String  | Specialty of the assigned doctor (joined from doctors table)       |
+
 * `400 Bad Request`: `{ "status": 400, "message": "Invalid appointment id" }` or `{ "status": 400, "message": "Invalid patient id" }`
 * `400 Bad Request`: `{ "status": 400, "message": "no report found" }` (No clinical results uploaded yet)
 
